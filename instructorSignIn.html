@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+
+	<style type="text/css">
+		table {
+			padding: 8px;
+			margin: auto;
+			position: absolute;
+		}
+
+		table tr td {
+			margin-left: 4px;
+			margin-right: 4px;
+		}
+	</style>
+
+	<script src="https://www.gstatic.com/firebasejs/6.3.0/firebase-app.js"></script>
+  	<script src="https://www.gstatic.com/firebasejs/3.1.0/firebase-database.js"></script>
+</head>
+<body>
+	<table frame="box" id="main_table">
+	  <tr>
+	    <td>DEPT:</td>
+	    <td><input type="text" name="" id="dept_text_input"></td>
+	  </tr>
+	  <tr>
+	  	<td>USERNAME:</td>
+	    <td><input type="text" name="" id="username_text_input"></td>
+	  </tr>
+	  <tr>
+	  	<td>DURATION(in minutes):</td>
+	    <td><input type="number" name="" id="duration_number_input"></td>
+	  </tr>
+	  <tr><td colspan="2"><button style="width: 40%; position: absolute; left: 30%;" onclick="setNewDeadlineForInstructor()">SUBMIT</button></td></tr>
+	</table>
+
+	<script type="text/javascript">
+		function setNewDeadlineForInstructor() {
+			var date = new Date();
+        	var timestamp = date.getTime()/1000;
+
+        	var dept = document.getElementById("dept_text_input").value
+        	var username = document.getElementById("username_text_input").value
+        	var duration = parseInt(document.getElementById("duration_number_input").value)
+
+        	var deadline = parseInt(timestamp + duration*60)
+
+        	firebase.database().ref(dept + '/' + username + '/deadline').set(deadline, function(error) { if (error) { console.log(error) }});
+		}
+	</script>
+
+	<script>
+	  var firebaseConfig = {
+	    apiKey: "AIzaSyAS3DfMduUcWgeOxtgqRAnswJA-tARoSFA",
+	    authDomain: "mark-1-266ea.firebaseapp.com",
+	    databaseURL: "https://mark-1-266ea.firebaseio.com",
+	    projectId: "mark-1-266ea",
+	    storageBucket: "",
+	    messagingSenderId: "201301416079",
+	    appId: "1:201301416079:web:93c19660d8180a84"
+	  };
+
+	  firebase.initializeApp(firebaseConfig);
+
+	  // Get a reference to the database service
+	  var database = firebase.database();
+	</script>
+
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+
+  <style type="text/css">
+    table, th, td {
+      border: solid 1px black;
+      text-align: center;
+    }
+
+    image {
+      height: 50px;
+    }
+  </style>
+
+  <script src="https://www.gstatic.com/firebasejs/6.3.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/3.1.0/firebase-database.js"></script>
+
+</head>
+<body>
+<table style="width:40%; left: 30%; position: absolute;" frame="box" id="main_table">
+  <tr>
+    <th width="100px"></th>
+    <th>Instructor</th>
+    <th>Office</th> 
+    <th>Status</th>
+    <th>Time Left</th>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  var deadline_array = []
+</script>
+
+<script type="text/javascript">
+  function getRemainingTimeInMinutesAndSeconds(time_in_seconds) {
+    return parseInt(time_in_seconds/60) + ":" + parseInt(time_in_seconds%60)
+  }
+
+  function parseURLForParameter(param) {
+    var url_string = window.location.href
+    var url = new URL(url_string);
+    return url.searchParams.get(param);
+  }
+
+  function addLineToTableWithSpecifications(photo_url, name, room) {
+    var html = "<tr><td><img width='100px' src=" + photo_url + " alt='YZI_PHOTO'></td><td>" + name + "</td><td>" + room + "</td><td></td><td></td></tr>"
+
+    var table = document.getElementById("main_table")
+
+    table.innerHTML += html
+  }
+
+  function updateTimeLeft() {
+
+    var table_rows = document.getElementById("main_table").getElementsByTagName("tr")
+
+    if(deadline_array.length > 0) {
+      for(var i = 0; i < deadline_array.length; i=i+1) {
+        var date = new Date();
+        var timestamp = date.getTime()/1000;
+
+        console.log(timestamp)
+
+        if(timestamp < deadline_array[i]) {
+          table_rows[i + 1].getElementsByTagName("td")[3].innerHTML = "🔵"
+          table_rows[i + 1].getElementsByTagName("td")[4].innerHTML = getRemainingTimeInMinutesAndSeconds(deadline_array[i] - timestamp)
+        } else {
+          table_rows[i + 1].getElementsByTagName("td")[3].innerHTML = "🔴"
+          table_rows[i + 1].getElementsByTagName("td")[4].innerHTML = "-"
+        }
+      }
+    }
+  }
+</script>
+
+<script type="text/javascript">
+  window.setInterval(function(){
+  updateTimeLeft()
+}, 1000);
+</script>
+
+<script>
+  var firebaseConfig = {
+    apiKey: "AIzaSyAS3DfMduUcWgeOxtgqRAnswJA-tARoSFA",
+    authDomain: "mark-1-266ea.firebaseapp.com",
+    databaseURL: "https://mark-1-266ea.firebaseio.com",
+    projectId: "mark-1-266ea",
+    storageBucket: "",
+    messagingSenderId: "201301416079",
+    appId: "1:201301416079:web:93c19660d8180a84"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+
+  // Get a reference to the database service
+  var database = firebase.database();
+
+  var database_ref = firebase.database().ref(parseURLForParameter("dept"));
+  
+  database_ref.once('value', function(snapshot) {
+    snapshot.forEach(function(childSnapshot) {
+      console.log(childSnapshot.val().photo_url)
+      addLineToTableWithSpecifications(childSnapshot.val().photo_url, childSnapshot.val().name, childSnapshot.val().room)
+      deadline_array.push(childSnapshot.val().deadline)
+  });
+  });
+</script>
+
+</body>
+
+</html>
